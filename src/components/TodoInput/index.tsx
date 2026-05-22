@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { View, TextInput, TouchableOpacity } from 'react-native'
+import { Plus } from 'lucide-react-native'
+import { theme } from '../../theme/colors'
+import styles from './styles'
 
 interface Props {
   onAdd: (title: string) => void
 }
+
 const TodoInput = ({ onAdd }: Props) => {
   const [inputValue, setInputValue] = useState('')
 
@@ -17,10 +21,12 @@ const TodoInput = ({ onAdd }: Props) => {
     <View style={styles.inputContainer}>
       <TextInput
         style={styles.input}
-        placeholder="Nova tarefa..."
+        placeholder="O que faremos hoje?"
+        placeholderTextColor={theme.textMuted}
         value={inputValue}
         onChangeText={setInputValue}
         onSubmitEditing={handlePress}
+        selectionColor={theme.primaryCyan}
         accessibilityLabel="Campo de entrada para nova tarefa"
       />
       <TouchableOpacity
@@ -28,33 +34,10 @@ const TodoInput = ({ onAdd }: Props) => {
         onPress={handlePress}
         accessibilityRole="button"
         accessibilityLabel="Adicionar tarefa">
-        <Text style={styles.addButtonText}>Adicionar</Text>
+        <Plus color={theme.bgDark} size={24} strokeWidth={3} />
       </TouchableOpacity>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  inputContainer: { flexDirection: 'row', marginBottom: 24, gap: 12, paddingHorizontal: 16 },
-  input: {
-    flex: 1,
-    height: 48,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 16,
-  },
-  addButton: {
-    backgroundColor: '#004B87',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    minHeight: 48,
-    minWidth: 44,
-  },
-  addButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16 },
-})
 
 export default TodoInput

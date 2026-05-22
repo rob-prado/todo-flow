@@ -1,6 +1,11 @@
 import { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native'
+import { Text, TextInput, TouchableOpacity, Alert } from 'react-native'
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable'
+import { Trash } from 'lucide-react-native'
 import { TodoDTO } from '../../types'
+import { theme } from '../../theme/colors'
+import styles from './styles'
 
 interface Props {
   todo: TodoDTO
@@ -20,97 +25,99 @@ const TodoItem = ({ todo, viewMode, onToggle, onEdit, onDelete }: Props) => {
     setIsEditing(false)
   }
 
-  return (
-    <View
-      style={[styles.container, viewMode === 'grid' && styles.gridContainer]}
+  const handleDeleteConfirm = () => {
+    Alert.alert('Excluir Tarefa', `Deseja realmente excluir "${todo.title}"?`, [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Excluir', style: 'destructive', onPress: () => onDelete(todo.id) },
+    ])
+  }
+
+  const animatedDotStyle = useAnimatedStyle(() => ({
+    backgroundColor: withTiming(todo.completed ? theme.primaryGreen : 'transparent', {
+      duration: 300,
+    }),
+    borderColor: withTiming(todo.completed ? theme.primaryGreen : theme.primaryYellow, {
+      duration: 300,
+    }),
+  }))
+
+  const animatedCardStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(todo.completed ? 0.7 : 1, { duration: 300 }),
+  }))
+
+  const renderRightActions = () => (
+    <TouchableOpacity
+      style={styles.deleteSwipe}
+      onPress={() => onDelete(todo.id)}
+      accessibilityRole="button"
+      accessibilityLabel="Excluir tarefa">
+      <Trash color="#FFF" size={20} />
+    </TouchableOpacity>
+  )
+
+  const ItemContent = (
+    <Animated.View
+      style={[
+        styles.container,
+        viewMode === 'grid' && styles.gridContainer,
+        todo.completed && styles.containerCompleted,
+        animatedCardStyle,
+      ]}
       accessibilityRole="button"
       accessibilityState={{ checked: todo.completed }}
       accessibilityLabel={`Tarefa: ${todo.title}, status: ${todo.completed ? 'Concluída' : 'Pendente'}`}>
+      {viewMode === 'grid' && !todo.completed && (
+        <TouchableOpacity
+          style={styles.gridDeleteBtn}
+          onPress={handleDeleteConfirm}
+          accessibilityRole="button"
+          accessibilityLabel="Excluir tarefa">
+          <Trash color={theme.textMuted} size={18} />
+        </TouchableOpacity>
+      )}
+
       <TouchableOpacity
-        style={[styles.checkbox, todo.completed && styles.checkboxDisabled]}
+        style={[styles.checkboxTouchWrapper, viewMode === 'grid' && styles.checkboxGridWrapper]}
         onPress={() => onToggle(todo.id)}
         disabled={todo.completed}
         accessibilityRole="checkbox"
         accessibilityLabel="Alternar status">
-        {todo.completed && <View style={styles.checkedInner} />}
+        <Animated.View style={[styles.statusDot, animatedDotStyle]} />
       </TouchableOpacity>
 
       {isEditing ? (
         <TextInput
-          style={styles.input}
+          style={[styles.input, viewMode === 'grid' && styles.inputGrid]}
           value={localTitle}
           onChangeText={setLocalTitle}
           onBlur={handleSave}
           onSubmitEditing={handleSave}
           autoFocus
+          selectionColor={theme.primaryCyan}
           accessibilityLabel="Editar título da tarefa"
+          multiline={viewMode === 'grid'}
         />
       ) : (
         <Text
-          style={[styles.title, todo.completed && styles.titleCompleted]}
+          style={[
+            styles.title,
+            todo.completed && styles.titleCompleted,
+            viewMode === 'grid' && styles.titleGrid,
+          ]}
           onPress={() => !todo.completed && setIsEditing(true)}>
           {todo.title}
         </Text>
       )}
+    </Animated.View>
+  )
 
-      {!todo.completed && (
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => onDelete(todo.id)}
-          accessibilityRole="button"
-          accessibilityLabel="Excluir tarefa">
-          <Text style={styles.deleteText}>X</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+  if (todo.completed || viewMode === 'grid') return ItemContent
+
+  return (
+    <ReanimatedSwipeable renderRightActions={renderRightActions} overshootRight={false}>
+      {ItemContent}
+    </ReanimatedSwipeable>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    minHeight: 44,
-  },
-  gridContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    marginHorizontal: 4,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#004B87',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    minWidth: 44,
-    minHeight: 44,
-  },
-  checkboxDisabled: {
-    opacity: 0.6,
-  },
-  checkedInner: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#004B87' },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1A202C',
-    padding: 0,
-    ...Platform.select({ ios: { paddingVertical: 4 }, android: { paddingVertical: 0 } }),
-  },
-  title: { flex: 1, fontSize: 16, color: '#1A202C' },
-  titleCompleted: { textDecorationLine: 'line-through', color: '#A0AEC0' },
-  deleteButton: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  deleteText: { color: '#E53E3E', fontWeight: 'bold' },
-})
 
 export default TodoItem

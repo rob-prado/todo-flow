@@ -1,0 +1,82 @@
+import { StyleSheet, Platform } from 'react-native'
+import { theme } from '../../theme/colors'
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: theme.bgSurface,
+    borderRadius: 12,
+    marginBottom: 8,
+    marginHorizontal: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.primaryCyan,
+    minHeight: 60,
+  },
+  containerCompleted: { borderLeftColor: theme.primaryGreen },
+  gridContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginHorizontal: 8,
+    minHeight: 130,
+    padding: 16,
+    paddingTop: 48,
+  },
+  gridDeleteBtn: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  checkboxTouchWrapper: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 6,
+    marginLeft: -10,
+  },
+  checkboxGridWrapper: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    marginLeft: 0,
+    marginRight: 0,
+    marginBottom: 0,
+  },
+  statusDot: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: theme.textMain,
+    padding: 0,
+    ...Platform.select({ ios: { paddingVertical: 4 }, android: { paddingVertical: 0 } }),
+  },
+  inputGrid: { flex: 0 },
+  title: { flex: 1, fontSize: 16, color: theme.textMain, fontWeight: '500' },
+  titleGrid: { flex: 0, marginTop: 0 },
+  titleCompleted: { textDecorationLine: 'line-through', color: theme.textMuted },
+  deleteSwipe: {
+    backgroundColor: theme.danger,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 70,
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    marginBottom: 8,
+    marginRight: 16,
+    height: 60,
+  },
+})
+
+export default styles

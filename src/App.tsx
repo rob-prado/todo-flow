@@ -1,9 +1,13 @@
+import 'react-native-gesture-handler'
 import * as React from 'react'
 import { useState, useRef } from 'react'
-import { StatusBar, StyleSheet, useColorScheme, View, Text, TouchableOpacity } from 'react-native'
+import { StatusBar, StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { LayoutGrid, List } from 'lucide-react-native'
 import { TodoDTO } from './types'
 import { TodoInput, TodoList } from './components'
+import { theme } from './theme/colors'
 
 function AppContent() {
   const insets = useSafeAreaInsets()
@@ -42,12 +46,20 @@ function AppContent() {
         },
       ]}>
       <View style={styles.header}>
-        <Text style={styles.logo}>TODO Flow</Text>
+        <View style={styles.logoContainer}>
+          <View style={styles.logoDotCyan} />
+          <View style={styles.logoDotGreen} />
+          <Text style={styles.logo}>TODO Flow</Text>
+        </View>
         <TouchableOpacity
           onPress={() => setViewMode((prev) => (prev === 'list' ? 'grid' : 'list'))}
           style={styles.iconButton}
           accessibilityRole="button">
-          <Text style={styles.iconText}>{viewMode === 'list' ? 'Grid' : 'List'}</Text>
+          {viewMode === 'list' ? (
+            <LayoutGrid color={theme.primaryCyan} size={24} />
+          ) : (
+            <List color={theme.primaryCyan} size={24} />
+          )}
         </TouchableOpacity>
       </View>
 
@@ -67,21 +79,19 @@ function AppContent() {
 }
 
 export default function App() {
-  const isDarkMode = useColorScheme() === 'dark'
-
   return (
-    <SafeAreaProvider>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor="#ffffff"
-      />
-      <AppContent />
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>
+        <StatusBar barStyle="light-content" backgroundColor={theme.bgDark} />
+        <AppContent />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  root: { flex: 1 },
+  container: { flex: 1, backgroundColor: theme.bgDark },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -90,7 +100,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 16,
   },
-  logo: { fontSize: 24, fontWeight: 'bold', color: '#004B87' },
+  logoContainer: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  logoDotCyan: { width: 12, height: 12, borderRadius: 6, backgroundColor: theme.primaryCyan },
+  logoDotGreen: { width: 12, height: 12, borderRadius: 6, backgroundColor: theme.primaryGreen },
+  logo: { fontSize: 24, fontWeight: 'bold', color: theme.textMain, letterSpacing: 1 },
   iconButton: { minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' },
-  iconText: { color: '#004B87', fontWeight: '600' },
 })

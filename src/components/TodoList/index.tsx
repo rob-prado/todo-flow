@@ -1,6 +1,10 @@
-import { FlatList, TouchableOpacity, Text, StyleSheet, View } from 'react-native'
+import { TouchableOpacity, Text, View } from 'react-native'
+import Animated, { LinearTransition, FadeInDown, FadeOut } from 'react-native-reanimated'
+import { Trash2 } from 'lucide-react-native'
 import TodoItem from '../TodoItem'
 import { TodoDTO } from '../../types'
+import { theme } from '../../theme/colors'
+import styles from './styles'
 
 interface Props {
   pending: TodoDTO[]
@@ -22,29 +26,43 @@ const TodoList = ({
   onClearCompleted,
 }: Props) => {
   return (
-    <FlatList
+    <Animated.FlatList
       key={viewMode}
       data={pending}
       keyExtractor={(item) => item.id}
       numColumns={viewMode === 'grid' ? 2 : 1}
-      renderItem={({ item }) => (
-        <TodoItem
-          todo={item}
-          viewMode={viewMode}
-          onToggle={onToggle}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      )}
+      columnWrapperStyle={viewMode === 'grid' ? styles.columnWrapper : undefined}
+      itemLayoutAnimation={LinearTransition.duration(300)}
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.listContent}
+      renderItem={({ item }) => (
+        <Animated.View
+          entering={FadeInDown.duration(400)}
+          exiting={FadeOut.duration(200)}
+          layout={LinearTransition.duration(300)}
+          style={viewMode === 'grid' ? styles.gridItem : styles.listItem}>
+          <TodoItem
+            todo={item}
+            viewMode={viewMode}
+            onToggle={onToggle}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        </Animated.View>
+      )}
       ListFooterComponent={
         completed.length > 0 ? (
-          <View style={styles.footerContainer}>
+          <Animated.View layout={LinearTransition.duration(300)} style={styles.footerContainer}>
             <Text style={styles.completedHeader}>Concluídas</Text>
 
             <View style={viewMode === 'grid' ? styles.gridWrapper : undefined}>
               {completed.map((item) => (
-                <View key={item.id} style={viewMode === 'grid' ? styles.gridItem : undefined}>
+                <Animated.View
+                  key={item.id}
+                  entering={FadeInDown.duration(400)}
+                  exiting={FadeOut.duration(200)}
+                  layout={LinearTransition.duration(300)}
+                  style={viewMode === 'grid' ? styles.gridItem : styles.listItem}>
                   <TodoItem
                     todo={item}
                     viewMode={viewMode}
@@ -52,7 +70,7 @@ const TodoList = ({
                     onEdit={onEdit}
                     onDelete={onDelete}
                   />
-                </View>
+                </Animated.View>
               ))}
             </View>
 
@@ -61,28 +79,14 @@ const TodoList = ({
               onPress={onClearCompleted}
               accessibilityRole="button"
               accessibilityLabel="Limpar histórico">
+              <Trash2 color={theme.textMuted} size={18} />
               <Text style={styles.clearButtonText}>Limpar Histórico de Concluídas</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         ) : null
       }
     />
   )
 }
-
-const styles = StyleSheet.create({
-  footerContainer: { marginTop: 16 },
-  completedHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4A5568',
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-  gridWrapper: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
-  gridItem: { width: '50%' },
-  clearButton: { marginTop: 16, paddingVertical: 16, alignItems: 'center', minHeight: 44 },
-  clearButtonText: { color: '#718096', fontSize: 14, textDecorationLine: 'underline' },
-})
 
 export default TodoList
