@@ -6,6 +6,6 @@ export const theme = {
   primaryYellow: '#FBBF24',
   textMain: '#F8FAFC',
   textMuted: '#94A3B8',
-  danger: '#EF4444',
+  error: '#EF4444',
   border: '#334155',
 }

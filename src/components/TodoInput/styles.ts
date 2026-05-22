@@ -3,8 +3,8 @@ import { theme } from '../../theme/colors'
 
 const styles = StyleSheet.create({
   inputContainer: { flexDirection: 'row', marginBottom: 24, gap: 12, paddingHorizontal: 16 },
+  inputWrapper: { flex: 1 },
   input: {
-    flex: 1,
     height: 52,
     backgroundColor: theme.bgSurface,
     borderWidth: 1,
@@ -13,6 +13,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     color: theme.textMain,
+  },
+  inputError: {
+    borderColor: theme.error ?? '#EF4444',
+  },
+  errorText: {
+    marginTop: 4,
+    marginLeft: 4,
+    fontSize: 12,
+    color: theme.error ?? '#EF4444',
   },
   addButton: {
     backgroundColor: theme.primaryCyan,

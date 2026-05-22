@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   titleGrid: { flex: 0, marginTop: 0 },
   titleCompleted: { textDecorationLine: 'line-through', color: theme.textMuted },
   deleteSwipe: {
-    backgroundColor: theme.danger,
+    backgroundColor: theme.error,
     justifyContent: 'center',
     alignItems: 'center',
     width: 70,
