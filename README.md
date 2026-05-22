@@ -10,7 +10,8 @@ Este projeto foi gerado com React Native CLI (Bare Workflow) e TypeScript. A doc
 
 1. Clone o repositório.
 2. Instale as dependências: `npm install` ou `yarn install`
-3. Instale os pods (iOS): `cd ios && pod-install && cd ..`
+3. Instale os pods (iOS): `cd ios && pod-install --repo-update && cd ..`
+   > **Nota:** O `react-native-mmkv` v4 depende do `react-native-nitro-modules`. Se o CocoaPods reportar erro de `NitroModules` não encontrado, certifique-se de que o `react-native-nitro-modules` está instalado e que o `pod install` incluiu `--repo-update`.
 4. Corra o projeto:
    - iOS: `npm run ios` ou `yarn ios`
    - Android: `npm run android` ou `yarn android`
@@ -18,9 +19,10 @@ Este projeto foi gerado com React Native CLI (Bare Workflow) e TypeScript. A doc
 
 ## 🛠 Tecnologias e Ecosistema
 
-- **React Native (Bare Workflow)** + **TypeScript**: Tipagem estrita com zero tolerância a `any` em produção. Contratos de dados definidos via interfaces (`TodoDTO`) para garantir consistência entre store e componentes.
+- **React Native 0.85 (New Architecture / Nitro)** + **TypeScript**: Tipagem estrita com zero tolerância a `any` em produção. Contratos de dados definidos via interfaces (`TodoDTO`) para garantir consistência entre store e componentes.
 - **Zustand**: State management minimalista e desacoplado. A store global (`useTodoStore`) centraliza o estado das tarefas e modo de visualização, eliminando prop-drilling e simplificando a injeção de estado em testes.
 - **Zod (v3)**: Validação de schemas em runtime que complementa o TypeScript. Garante que dados de entrada do utilizador e entidades `TodoDTO` respeitem contratos mesmo em fronteiras externas (input de texto, persistência futura).
+- **React Native MMKV (v4)**: Armazenamento chave-valor síncrono e criptografado (via JSI/Nitro). Substituí o AsyncStorage pela superior performance de leitura/escrita e pela API síncrona, que se integra naturalmente ao `persist` do Zustand sem Promises ou efeitos colaterais assíncronos.
 - **React Native Reanimated (v3/v4)**: Motor de animações nativas que roda na UI Thread. Utilizado para transições de layout (`LinearTransition`), animações de entrada/saída (`FadeInDown`, `FadeOut`) e micro-interações a 60FPS (animação do indicador de status e opacidade do card ao concluir).
 - **React Native Gesture Handler**: Gestos fluidos e responsivos na UI Thread. Integração com `ReanimatedSwipeable` para ação de exclusão via swipe no modo lista.
 - **Lucide React Native**: Biblioteca de ícones vetoriais leves e consistentes.
@@ -35,6 +37,7 @@ Este projeto foi gerado com React Native CLI (Bare Workflow) e TypeScript. A doc
 - **Segurança de Borda (Zod)**: Schemas validam dados em duas camadas:
   - **Input** (`TodoInputSchema`): `safeParse` no `TodoInput` rejeita títulos vazios, espaços puros e textos >100 caracteres antes de tocar na store, exibindo feedback visual (borda vermelha + label);
   - **Entidade** (`TodoDTOSchema`): `parse` na store garante que todo objeto `TodoDTO` criado internamente respeite o contrato completo (`id`, `title`, `completed`, `createdAt`).
+- **Persistência Síncrona (MMKV)**: O estado das tarefas (`todos`) e o contador de IDs (`idCounter`) sobrevivem ao reload do app via `zustand/middleware/persist`. O adapter `createJSONStorage` embrulha o MMKV com `JSON.parse`/`JSON.stringify`, mantendo a tipagem do Zustand intacta. O modo de visualização (`viewMode`) é intencionalmente **efêmero** — não é persistido, resetando para `list` a cada sessão.
 - **Design System**: Tema centralizado em `theme/colors.ts` com identidade visual da PWI Sistemas — Paleta Dark Mode composta por Azul Escuro (`#1A2639`), Cyan (`#38BDF8`) e Verde (`#A3E635`). Tipografia e espaçamentos seguem consistência rigorosa para alto contraste e legibilidade.
 - **Visualização Adaptativa**: Comportamentos de UI adaptam-se dinamicamente ao contexto:
   - **Modo Lista**: Exclusão via gesto de swipe (`ReanimatedSwipeable`) com ação destrutiva à direita;
@@ -56,6 +59,8 @@ Este projeto foi gerado com React Native CLI (Bare Workflow) e TypeScript. A doc
     - `react-native-reanimated` — mock com `__esModule: true` e factory de componentes animados (`Animated.FlatList`, `Animated.View`, hooks de estilo);
     - `react-native-gesture-handler/ReanimatedSwipeable` — mock simplificado para evitar dependências de UI Thread no ambiente Node;
     - `react-native-worklets` — stubs para `runOnUI` e `runOnJS`;
+    - `react-native-nitro-modules` — stub do runtime Nitro (dependência do MMKV v4);
+    - `react-native-mmkv` — mock com `Map` em memória (`mockMmkvStorage`), simulando `getString`, `set`, `delete` e `clearAll`;
     - `lucide-react-native` — proxy que renderiza `View` inertes, eliminando a necessidade de mockar ícones individualmente.
   - Para executar: `npm run test` ou `yarn test`
 
@@ -84,6 +89,7 @@ src/
 │       ├── index.tsx
 │       └── styles.ts
 ├── store/
+│   ├── mmkv.ts
 │   └── useTodoStore.ts
 ├── theme/
 │   └── colors.ts
@@ -101,6 +107,8 @@ jest.setup.ts
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Zustand em vez de Context API**           | Para uma tela única, Context API introduziria boilerplate desnecessário (Providers, `useReducer`). Zustand oferece API mais concisa, melhor performance em atualizações frequentes (seletores evitam re-renders) e testabilidade superior (injeção direta de estado).                                                                          |
 | **Zod v3 em vez de v4**                     | O Zod v4 introduz sintaxe `export * as` que exige plugin adicional do Babel no React Native CLI. A v3 oferece a mesma API de schemas (`safeParse`, `z.infer`, `.pipe`, `.transform`) com compatibilidade imediata, sem alterar a configuração de build.                                                                                        |
+| **MMKV v4 em vez de AsyncStorage**          | MMKV oferece API síncrona (sem Promises), criptografia nativa e performance superior. A v4 adota o runtime Nitro, alinhado com a New Architecture do RN 0.85. O trade-off é a dependência adicional (`react-native-nitro-modules`) e o `pod install --repo-update`.                                                                            |
+| **Adapter MMKV com `createJSONStorage`**    | O Zustand exige `PersistStorage<T, unknown>`, que inclui `JSON.parse`/`JSON.stringify`. Em vez de implementar o adapter manualmente (que quebrava a tipagem), `createJSONStorage(() => adapter)` embrulha o MMKV corretamente, mantendo type-safety e permitindo `partialize`.                                                              |
 | **Mock de Reanimated no Jest**              | Reanimated v3/v4 depende de C++ nativo e Worklet Runtime, inexistentes no ambiente Node. O mock factory no `jest.setup.ts` com `__esModule: true` garante que `import Animated from 'react-native-reanimated'` resolva corretamente, permitindo que componentes com `Animated.FlatList` e `Animated.View` renderizem sem erros de `undefined`. |
 | **Edição via `onBlur` + `onSubmitEditing`** | Em vez de modais ou telas separadas, a edição inline reduz atrito cognitivo. O `TextInput` substitui o `Text` condicionalmente, mantendo o foco contextual e minimizando mudanças de layout.                                                                                                                                                   |
 | **Separação de Pendentes e Concluídas**     | A lista principal (`FlatList`) renderiza apenas pendentes para otimizar o VirtualizedList. Concluídas são renderizadas como `ListFooterComponent`, evitando complexidade de seções múltiplas enquanto mantém a hierarquia visual clara.                                                                                                        |

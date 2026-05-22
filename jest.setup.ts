@@ -1,8 +1,27 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 import 'react-native-gesture-handler/jestSetup'
 
+jest.mock('react-native-nitro-modules', () => ({
+  NitroModules: {
+    createHybridObject: jest.fn(),
+  },
+}))
+
+const mockMmkvStorage = new Map<string, string>()
+
+jest.mock('react-native-mmkv', () => ({
+  createMMKV: jest.fn().mockImplementation(() => ({
+    getString: (key: string) => mockMmkvStorage.get(key) ?? undefined,
+    set: (key: string, value: string) => mockMmkvStorage.set(key, value),
+    delete: (key: string) => mockMmkvStorage.delete(key),
+    getAllKeys: () => Array.from(mockMmkvStorage.keys()),
+    clearAll: () => mockMmkvStorage.clear(),
+  })),
+  existsMMKV: () => false,
+  deleteMMKV: () => true,
+}))
+
 jest.mock('react-native-reanimated', () => {
-  const RN = require('react-native')
+  const RN = jest.requireActual('react-native') as typeof import('react-native')
   const createAnimatedComponent = (c: unknown) => c
 
   return {
@@ -32,8 +51,8 @@ jest.mock('react-native-reanimated', () => {
 })
 
 jest.mock('lucide-react-native', () => {
-  const { View } = require('react-native')
-  return new Proxy({}, { get: () => View })
+  const RN = jest.requireActual('react-native') as typeof import('react-native')
+  return new Proxy({}, { get: () => RN.View })
 })
 
 jest.mock('react-native-worklets', () => ({

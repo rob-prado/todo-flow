@@ -3,6 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react-native'
 import { Alert } from 'react-native'
 import App from '../App'
 import { useTodoStore } from '../store/useTodoStore'
+import storage from '../store/storage'
 
 jest.mock('react-native-safe-area-context', () => {
   const inset = { top: 0, right: 0, bottom: 0, left: 0 }
@@ -16,7 +17,8 @@ jest.spyOn(Alert, 'alert')
 
 describe('Fluxos de TODO (CRUD Completo)', () => {
   beforeEach(() => {
-    useTodoStore.setState({ todos: [], viewMode: 'list' })
+    storage.clearAll()
+    useTodoStore.setState({ todos: [], viewMode: 'list', idCounter: 0 })
     jest.clearAllMocks()
   })
 

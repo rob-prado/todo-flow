@@ -7510,6 +7510,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-mmkv@npm:^4.3.1":
+  version: 4.3.1
+  resolution: "react-native-mmkv@npm:4.3.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-nitro-modules: "*"
+  checksum: 10c0/cfafff8e9837e9244c4544fcf26d8570f66539e97ade7ee9cfd2dc51328b6e793357a29a8336bf6f5a540f894780726ae404fef5059756b157ea3cee2fce6566
+  languageName: node
+  linkType: hard
+
+"react-native-nitro-modules@npm:^0.35.7":
+  version: 0.35.7
+  resolution: "react-native-nitro-modules@npm:0.35.7"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/f0c9167655032952bfdadd6802eade60796df2021e29a451ec205843dd6e95c6cb274d77c77534703a5d5d55e45c6f7ca1900a94813de3e0bdb0f3aa654cf3fc
+  languageName: node
+  linkType: hard
+
 "react-native-reanimated@npm:^4.3.1":
   version: 4.3.1
   resolution: "react-native-reanimated@npm:4.3.1"
@@ -8555,6 +8576,8 @@ __metadata:
     react: "npm:19.2.3"
     react-native: "npm:0.85.3"
     react-native-gesture-handler: "npm:^2.31.2"
+    react-native-mmkv: "npm:^4.3.1"
+    react-native-nitro-modules: "npm:^0.35.7"
     react-native-reanimated: "npm:^4.3.1"
     react-native-safe-area-context: "npm:^5.5.2"
     react-native-svg: "npm:^15.15.5"
