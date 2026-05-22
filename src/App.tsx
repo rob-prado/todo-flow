@@ -1,38 +1,31 @@
 import 'react-native-gesture-handler'
 import * as React from 'react'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { StatusBar, StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { LayoutGrid, List } from 'lucide-react-native'
-import { TodoDTO } from './types'
 import { TodoInput, TodoList } from './components'
+import { useTodos } from './hooks/useTodos'
 import { theme } from './theme/colors'
 
 function AppContent() {
   const insets = useSafeAreaInsets()
-  const idCounter = useRef(0)
-
-  const [todos, setTodos] = useState<TodoDTO[]>([])
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
 
-  const handleAdd = (title: string) => {
-    idCounter.current += 1
-    setTodos([
-      { id: idCounter.current.toString(), title, completed: false, createdAt: Date.now() },
-      ...todos,
-    ])
+  const {
+    pendingTodos,
+    completedTodos,
+    handleAddTodo,
+    handleToggleTodoStatus,
+    handleEditTodoTitle,
+    handleDeleteTodo,
+    handleClearCompletedTodos,
+  } = useTodos()
+
+  const toggleViewMode = () => {
+    setViewMode((previousMode) => (previousMode === 'list' ? 'grid' : 'list'))
   }
-
-  const handleToggle = (id: string) =>
-    setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)))
-  const handleEdit = (id: string, title: string) =>
-    setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, title } : t)))
-  const handleDelete = (id: string) => setTodos((prev) => prev.filter((t) => t.id !== id))
-  const handleClearCompleted = () => setTodos((prev) => prev.filter((t) => !t.completed))
-
-  const pendingTodos = todos.filter((t) => !t.completed)
-  const completedTodos = todos.filter((t) => t.completed)
 
   return (
     <View
@@ -52,7 +45,7 @@ function AppContent() {
           <Text style={styles.logo}>TODO Flow</Text>
         </View>
         <TouchableOpacity
-          onPress={() => setViewMode((prev) => (prev === 'list' ? 'grid' : 'list'))}
+          onPress={toggleViewMode}
           style={styles.iconButton}
           accessibilityRole="button">
           {viewMode === 'list' ? (
@@ -63,16 +56,16 @@ function AppContent() {
         </TouchableOpacity>
       </View>
 
-      <TodoInput onAdd={handleAdd} />
+      <TodoInput onAdd={handleAddTodo} />
 
       <TodoList
         pending={pendingTodos}
         completed={completedTodos}
         viewMode={viewMode}
-        onToggle={handleToggle}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onClearCompleted={handleClearCompleted}
+        onToggle={handleToggleTodoStatus}
+        onEdit={handleEditTodoTitle}
+        onDelete={handleDeleteTodo}
+        onClearCompleted={handleClearCompletedTodos}
       />
     </View>
   )

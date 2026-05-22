@@ -16,16 +16,16 @@ interface Props {
 }
 
 const TodoItem = ({ todo, viewMode, onToggle, onEdit, onDelete }: Props) => {
-  const [isEditing, setIsEditing] = useState(false)
-  const [localTitle, setLocalTitle] = useState(todo.title)
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [editedTitle, setEditedTitle] = useState(todo.title)
 
-  const handleSave = () => {
-    if (!localTitle.trim()) return
-    onEdit(todo.id, localTitle)
-    setIsEditing(false)
+  const handleSaveEditedTitle = () => {
+    if (!editedTitle.trim()) return
+    onEdit(todo.id, editedTitle)
+    setIsEditingTitle(false)
   }
 
-  const handleDeleteConfirm = () => {
+  const confirmTaskDeletion = () => {
     Alert.alert('Excluir Tarefa', `Deseja realmente excluir "${todo.title}"?`, [
       { text: 'Cancelar', style: 'cancel' },
       { text: 'Excluir', style: 'destructive', onPress: () => onDelete(todo.id) },
@@ -69,7 +69,7 @@ const TodoItem = ({ todo, viewMode, onToggle, onEdit, onDelete }: Props) => {
       {viewMode === 'grid' && !todo.completed && (
         <TouchableOpacity
           style={styles.gridDeleteBtn}
-          onPress={handleDeleteConfirm}
+          onPress={confirmTaskDeletion}
           accessibilityRole="button"
           accessibilityLabel="Excluir tarefa">
           <Trash color={theme.textMuted} size={18} />
@@ -85,13 +85,13 @@ const TodoItem = ({ todo, viewMode, onToggle, onEdit, onDelete }: Props) => {
         <Animated.View style={[styles.statusDot, animatedDotStyle]} />
       </TouchableOpacity>
 
-      {isEditing ? (
+      {isEditingTitle ? (
         <TextInput
           style={[styles.input, viewMode === 'grid' && styles.inputGrid]}
-          value={localTitle}
-          onChangeText={setLocalTitle}
-          onBlur={handleSave}
-          onSubmitEditing={handleSave}
+          value={editedTitle}
+          onChangeText={setEditedTitle}
+          onBlur={handleSaveEditedTitle}
+          onSubmitEditing={handleSaveEditedTitle}
           autoFocus
           selectionColor={theme.primaryCyan}
           accessibilityLabel="Editar título da tarefa"
@@ -104,7 +104,7 @@ const TodoItem = ({ todo, viewMode, onToggle, onEdit, onDelete }: Props) => {
             todo.completed && styles.titleCompleted,
             viewMode === 'grid' && styles.titleGrid,
           ]}
-          onPress={() => !todo.completed && setIsEditing(true)}>
+          onPress={() => !todo.completed && setIsEditingTitle(true)}>
           {todo.title}
         </Text>
       )}

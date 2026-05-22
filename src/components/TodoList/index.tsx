@@ -29,20 +29,20 @@ const TodoList = ({
     <Animated.FlatList
       key={viewMode}
       data={pending}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(todo) => todo.id}
       numColumns={viewMode === 'grid' ? 2 : 1}
       columnWrapperStyle={viewMode === 'grid' ? styles.columnWrapper : undefined}
       itemLayoutAnimation={LinearTransition.duration(300)}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.listContent}
-      renderItem={({ item }) => (
+      renderItem={({ item: currentTodo }) => (
         <Animated.View
           entering={FadeInDown.duration(400)}
           exiting={FadeOut.duration(200)}
           layout={LinearTransition.duration(300)}
           style={viewMode === 'grid' ? styles.gridItem : styles.listItem}>
           <TodoItem
-            todo={item}
+            todo={currentTodo}
             viewMode={viewMode}
             onToggle={onToggle}
             onEdit={onEdit}
@@ -56,15 +56,15 @@ const TodoList = ({
             <Text style={styles.completedHeader}>Concluídas</Text>
 
             <View style={viewMode === 'grid' ? styles.gridWrapper : undefined}>
-              {completed.map((item) => (
+              {completed.map((completedTodo) => (
                 <Animated.View
-                  key={item.id}
+                  key={completedTodo.id}
                   entering={FadeInDown.duration(400)}
                   exiting={FadeOut.duration(200)}
                   layout={LinearTransition.duration(300)}
                   style={viewMode === 'grid' ? styles.gridItem : styles.listItem}>
                   <TodoItem
-                    todo={item}
+                    todo={completedTodo}
                     viewMode={viewMode}
                     onToggle={onToggle}
                     onEdit={onEdit}
