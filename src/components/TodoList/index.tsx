@@ -2,34 +2,23 @@ import { TouchableOpacity, Text, View } from 'react-native'
 import Animated, { LinearTransition, FadeInDown, FadeOut } from 'react-native-reanimated'
 import { Trash2 } from 'lucide-react-native'
 import TodoItem from '../TodoItem'
-import { TodoDTO } from '../../types'
+import { useTodoStore } from '../../store/useTodoStore'
 import { theme } from '../../theme/colors'
 import styles from './styles'
 
-interface Props {
-  pending: TodoDTO[]
-  completed: TodoDTO[]
-  viewMode: 'list' | 'grid'
-  onToggle: (id: string) => void
-  onEdit: (id: string, title: string) => void
-  onDelete: (id: string) => void
-  onClearCompleted: () => void
-}
+const TodoList = () => {
+  const todos = useTodoStore((state) => state.todos)
+  const viewMode = useTodoStore((state) => state.viewMode)
+  const clearCompletedTodos = useTodoStore((state) => state.clearCompletedTodos)
 
-const TodoList = ({
-  pending,
-  completed,
-  viewMode,
-  onToggle,
-  onEdit,
-  onDelete,
-  onClearCompleted,
-}: Props) => {
+  const pendingTodos = todos.filter((currentTodo) => !currentTodo.completed)
+  const completedTodos = todos.filter((currentTodo) => currentTodo.completed)
+
   return (
     <Animated.FlatList
       key={viewMode}
-      data={pending}
-      keyExtractor={(todo) => todo.id}
+      data={pendingTodos}
+      keyExtractor={(currentTodo) => currentTodo.id}
       numColumns={viewMode === 'grid' ? 2 : 1}
       columnWrapperStyle={viewMode === 'grid' ? styles.columnWrapper : undefined}
       itemLayoutAnimation={LinearTransition.duration(300)}
@@ -41,42 +30,30 @@ const TodoList = ({
           exiting={FadeOut.duration(200)}
           layout={LinearTransition.duration(300)}
           style={viewMode === 'grid' ? styles.gridItem : styles.listItem}>
-          <TodoItem
-            todo={currentTodo}
-            viewMode={viewMode}
-            onToggle={onToggle}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
+          <TodoItem todo={currentTodo} />
         </Animated.View>
       )}
       ListFooterComponent={
-        completed.length > 0 ? (
+        completedTodos.length > 0 ? (
           <Animated.View layout={LinearTransition.duration(300)} style={styles.footerContainer}>
             <Text style={styles.completedHeader}>Concluídas</Text>
 
             <View style={viewMode === 'grid' ? styles.gridWrapper : undefined}>
-              {completed.map((completedTodo) => (
+              {completedTodos.map((completedTodo) => (
                 <Animated.View
                   key={completedTodo.id}
                   entering={FadeInDown.duration(400)}
                   exiting={FadeOut.duration(200)}
                   layout={LinearTransition.duration(300)}
                   style={viewMode === 'grid' ? styles.gridItem : styles.listItem}>
-                  <TodoItem
-                    todo={completedTodo}
-                    viewMode={viewMode}
-                    onToggle={onToggle}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
+                  <TodoItem todo={completedTodo} />
                 </Animated.View>
               ))}
             </View>
 
             <TouchableOpacity
               style={styles.clearButton}
-              onPress={onClearCompleted}
+              onPress={clearCompletedTodos}
               accessibilityRole="button"
               accessibilityLabel="Limpar histórico">
               <Trash2 color={theme.textMuted} size={18} />

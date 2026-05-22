@@ -1,19 +1,17 @@
 import React, { useState } from 'react'
 import { View, TextInput, TouchableOpacity } from 'react-native'
 import { Plus } from 'lucide-react-native'
+import { useTodoStore } from '../../store/useTodoStore'
 import { theme } from '../../theme/colors'
 import styles from './styles'
 
-interface Props {
-  onAdd: (title: string) => void
-}
-
-const TodoInput = ({ onAdd }: Props) => {
+const TodoInput = () => {
   const [inputValue, setInputValue] = useState('')
+  const addTodo = useTodoStore((state) => state.addTodo)
 
   const handlePress = () => {
     if (!inputValue.trim()) return
-    onAdd(inputValue)
+    addTodo(inputValue)
     setInputValue('')
   }
 

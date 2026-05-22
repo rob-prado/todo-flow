@@ -4,31 +4,33 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable'
 import { Trash } from 'lucide-react-native'
 import { TodoDTO } from '../../types'
+import { useTodoStore } from '../../store/useTodoStore'
 import { theme } from '../../theme/colors'
 import styles from './styles'
 
 interface Props {
   todo: TodoDTO
-  viewMode: 'list' | 'grid'
-  onToggle: (id: string) => void
-  onEdit: (id: string, title: string) => void
-  onDelete: (id: string) => void
 }
 
-const TodoItem = ({ todo, viewMode, onToggle, onEdit, onDelete }: Props) => {
+const TodoItem = ({ todo }: Props) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [editedTitle, setEditedTitle] = useState(todo.title)
 
+  const viewMode = useTodoStore((state) => state.viewMode)
+  const toggleTodoStatus = useTodoStore((state) => state.toggleTodoStatus)
+  const editTodoTitle = useTodoStore((state) => state.editTodoTitle)
+  const deleteTodo = useTodoStore((state) => state.deleteTodo)
+
   const handleSaveEditedTitle = () => {
     if (!editedTitle.trim()) return
-    onEdit(todo.id, editedTitle)
+    editTodoTitle(todo.id, editedTitle)
     setIsEditingTitle(false)
   }
 
   const confirmTaskDeletion = () => {
     Alert.alert('Excluir Tarefa', `Deseja realmente excluir "${todo.title}"?`, [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Excluir', style: 'destructive', onPress: () => onDelete(todo.id) },
+      { text: 'Excluir', style: 'destructive', onPress: () => deleteTodo(todo.id) },
     ])
   }
 
@@ -48,7 +50,7 @@ const TodoItem = ({ todo, viewMode, onToggle, onEdit, onDelete }: Props) => {
   const renderRightActions = () => (
     <TouchableOpacity
       style={styles.deleteSwipe}
-      onPress={() => onDelete(todo.id)}
+      onPress={() => deleteTodo(todo.id)}
       accessibilityRole="button"
       accessibilityLabel="Excluir tarefa">
       <Trash color="#FFF" size={20} />
@@ -78,7 +80,7 @@ const TodoItem = ({ todo, viewMode, onToggle, onEdit, onDelete }: Props) => {
 
       <TouchableOpacity
         style={[styles.checkboxTouchWrapper, viewMode === 'grid' && styles.checkboxGridWrapper]}
-        onPress={() => onToggle(todo.id)}
+        onPress={() => toggleTodoStatus(todo.id)}
         disabled={todo.completed}
         accessibilityRole="checkbox"
         accessibilityLabel="Alternar status">

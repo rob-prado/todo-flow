@@ -1,31 +1,17 @@
 import 'react-native-gesture-handler'
 import * as React from 'react'
-import { useState } from 'react'
 import { StatusBar, StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { LayoutGrid, List } from 'lucide-react-native'
 import { TodoInput, TodoList } from './components'
-import { useTodos } from './hooks/useTodos'
+import { useTodoStore } from './store/useTodoStore'
 import { theme } from './theme/colors'
 
 function AppContent() {
   const insets = useSafeAreaInsets()
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
-
-  const {
-    pendingTodos,
-    completedTodos,
-    handleAddTodo,
-    handleToggleTodoStatus,
-    handleEditTodoTitle,
-    handleDeleteTodo,
-    handleClearCompletedTodos,
-  } = useTodos()
-
-  const toggleViewMode = () => {
-    setViewMode((previousMode) => (previousMode === 'list' ? 'grid' : 'list'))
-  }
+  const viewMode = useTodoStore((state) => state.viewMode)
+  const toggleViewMode = useTodoStore((state) => state.toggleViewMode)
 
   return (
     <View
@@ -56,17 +42,9 @@ function AppContent() {
         </TouchableOpacity>
       </View>
 
-      <TodoInput onAdd={handleAddTodo} />
+      <TodoInput />
 
-      <TodoList
-        pending={pendingTodos}
-        completed={completedTodos}
-        viewMode={viewMode}
-        onToggle={handleToggleTodoStatus}
-        onEdit={handleEditTodoTitle}
-        onDelete={handleDeleteTodo}
-        onClearCompleted={handleClearCompletedTodos}
-      />
+      <TodoList />
     </View>
   )
 }
