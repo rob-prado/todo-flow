@@ -35,7 +35,7 @@ Este projeto foi gerado com React Native CLI (Bare Workflow) e TypeScript. A doc
   - Reset determinístico do estado entre testes (`useTodoStore.setState(...)`);
   - Alteração de modo de visualização (`list` ↔ `grid`) sem re-renderização cascata de componentes não afetados.
 - **Segurança de Borda (Zod)**: Schemas validam dados em duas camadas:
-  - **Input** (`TodoInputSchema`): `safeParse` no `TodoInput` rejeita títulos vazios, espaços puros e textos >100 caracteres antes de tocar na store, exibindo feedback visual (borda vermelha + label);
+  - **Input** (`TodoInputSchema`): `safeParse` no `TodoInput` rejeita títulos vazios, espaços puros e textos >500 caracteres antes de tocar na store, exibindo feedback visual (borda vermelha + label);
   - **Entidade** (`TodoDTOSchema`): `parse` na store garante que todo objeto `TodoDTO` criado internamente respeite o contrato completo (`id`, `title`, `completed`, `createdAt`).
 - **Persistência Síncrona (MMKV)**: O estado das tarefas (`todos`) e o contador de IDs (`idCounter`) sobrevivem ao reload do app via `zustand/middleware/persist`. O adapter `createJSONStorage` embrulha o MMKV com `JSON.parse`/`JSON.stringify`, mantendo a tipagem do Zustand intacta. O modo de visualização (`viewMode`) é intencionalmente **efêmero** — não é persistido, resetando para `list` a cada sessão.
 - **Design System**: Tema centralizado em `theme/colors.ts` com identidade visual da PWI Sistemas — Paleta Dark Mode composta por Azul Escuro (`#1A2639`), Cyan (`#38BDF8`) e Verde (`#A3E635`). Tipografia e espaçamentos seguem consistência rigorosa para alto contraste e legibilidade.
