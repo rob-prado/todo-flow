@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Text, TextInput, TouchableOpacity, Alert } from 'react-native'
+import { Text, TextInput, Pressable, Alert } from 'react-native'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable'
 import { Trash } from 'lucide-react-native'
@@ -48,13 +48,13 @@ const TodoItem = ({ todo }: Props) => {
   }))
 
   const renderRightActions = () => (
-    <TouchableOpacity
-      style={styles.deleteSwipe}
+    <Pressable
+      style={({ pressed }) => [styles.deleteSwipe, pressed && styles.pressed]}
       onPress={() => deleteTodo(todo.id)}
       accessibilityRole="button"
       accessibilityLabel="Excluir tarefa">
       <Trash color="#FFF" size={20} />
-    </TouchableOpacity>
+    </Pressable>
   )
 
   const ItemContent = (
@@ -69,23 +69,27 @@ const TodoItem = ({ todo }: Props) => {
       accessibilityState={{ checked: todo.completed }}
       accessibilityLabel={`Tarefa: ${todo.title}, status: ${todo.completed ? 'Concluída' : 'Pendente'}`}>
       {viewMode === 'grid' && !todo.completed && (
-        <TouchableOpacity
-          style={styles.gridDeleteBtn}
+        <Pressable
+          style={({ pressed }) => [styles.gridDeleteBtn, pressed && styles.pressed]}
           onPress={confirmTaskDeletion}
           accessibilityRole="button"
           accessibilityLabel="Excluir tarefa">
           <Trash color={theme.textMuted} size={18} />
-        </TouchableOpacity>
+        </Pressable>
       )}
 
-      <TouchableOpacity
-        style={[styles.checkboxTouchWrapper, viewMode === 'grid' && styles.checkboxGridWrapper]}
+      <Pressable
+        style={({ pressed }) => [
+          styles.checkboxTouchWrapper,
+          viewMode === 'grid' && styles.checkboxGridWrapper,
+          pressed && styles.pressed,
+        ]}
         onPress={() => toggleTodoStatus(todo.id)}
         disabled={todo.completed}
         accessibilityRole="checkbox"
         accessibilityLabel="Alternar status">
         <Animated.View style={[styles.statusDot, animatedDotStyle]} />
-      </TouchableOpacity>
+      </Pressable>
 
       {isEditingTitle ? (
         <TextInput

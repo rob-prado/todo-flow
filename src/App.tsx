@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler'
 import * as React from 'react'
-import { StatusBar, StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { StatusBar, StyleSheet, View, Text, Pressable } from 'react-native'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { LayoutGrid, List } from 'lucide-react-native'
@@ -30,16 +30,16 @@ function AppContent() {
           <View style={styles.logoDotGreen} />
           <Text style={styles.logo}>TODO Flow</Text>
         </View>
-        <TouchableOpacity
+        <Pressable
           onPress={toggleViewMode}
-          style={styles.iconButton}
+          style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
           accessibilityRole="button">
           {viewMode === 'list' ? (
             <LayoutGrid color={theme.primaryCyan} size={24} />
           ) : (
             <List color={theme.primaryCyan} size={24} />
           )}
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <TodoInput />
@@ -76,4 +76,5 @@ const styles = StyleSheet.create({
   logoDotGreen: { width: 12, height: 12, borderRadius: 6, backgroundColor: theme.primaryGreen },
   logo: { fontSize: 24, fontWeight: 'bold', color: theme.textMain, letterSpacing: 1 },
   iconButton: { minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' },
+  pressed: { opacity: 0.7 },
 })

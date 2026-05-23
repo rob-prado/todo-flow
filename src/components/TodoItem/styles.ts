@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     padding: 0,
     ...Platform.select({ ios: { paddingVertical: 4 }, android: { paddingVertical: 0 } }),
   },
+  pressed: { opacity: 0.7 },
   inputGrid: { flex: 0 },
   title: { flex: 1, fontSize: 16, color: theme.textMain, fontWeight: '500' },
   titleGrid: { flex: 0, marginTop: 0 },

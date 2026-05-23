@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, TextInput, TouchableOpacity, Text } from 'react-native'
+import { View, TextInput, Pressable, Text } from 'react-native'
 import { Plus } from 'lucide-react-native'
 import { useTodoStore } from '../../store/useTodoStore'
 import { TodoInputSchema } from '../../types'
@@ -44,13 +44,13 @@ const TodoInput = () => {
         />
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </View>
-      <TouchableOpacity
-        style={styles.addButton}
+      <Pressable
+        style={({ pressed }) => [styles.addButton, pressed && styles.pressed]}
         onPress={handlePress}
         accessibilityRole="button"
         accessibilityLabel="Adicionar tarefa">
         <Plus color={theme.bgDark} size={24} strokeWidth={3} />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   )
 }

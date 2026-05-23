@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import Animated, { LinearTransition, FadeInDown, FadeOut } from 'react-native-reanimated'
 import { Trash2 } from 'lucide-react-native'
 import TodoItem from '../TodoItem'
@@ -51,14 +51,14 @@ const TodoList = () => {
               ))}
             </View>
 
-            <TouchableOpacity
-              style={styles.clearButton}
+            <Pressable
+              style={({ pressed }) => [styles.clearButton, pressed && styles.pressed]}
               onPress={clearCompletedTodos}
               accessibilityRole="button"
               accessibilityLabel="Limpar histórico">
               <Trash2 color={theme.textMuted} size={18} />
               <Text style={styles.clearButtonText}>Limpar Histórico de Concluídas</Text>
-            </TouchableOpacity>
+            </Pressable>
           </Animated.View>
         ) : null
       }

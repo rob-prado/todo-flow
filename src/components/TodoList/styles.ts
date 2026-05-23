@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.bgSurface,
     minHeight: 44,
   },
+  pressed: { opacity: 0.7 },
   clearButtonText: { color: theme.textMuted, fontSize: 14, fontWeight: '600' },
 })
 

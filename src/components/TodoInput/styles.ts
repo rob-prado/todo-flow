@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.textMain,
   },
+  pressed: { opacity: 0.7 },
   inputError: {
     borderColor: theme.error ?? '#EF4444',
   },
