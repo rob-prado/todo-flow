@@ -49,7 +49,6 @@ Este projeto foi gerado com React Native CLI (Bare Workflow) e TypeScript. A doc
 - **Testes Automatizados**: Suite completa de integração implementada com `@testing-library/react-native`, adotando a filosofia de **User-Centric Testing**. Os testes validam fluxos de negócio reais (CRUD completo) — adição com validação de entrada, edição inline por blur/submit, alternância de status, exclusão com confirmação em modal nativo (`Alert`) e limpeza de histórico — sem acoplar-se a detalhes de implementação visual.
 
   A estratégia de queries baseia-se em **acessibilidade** (`accessibilityLabel` e texto visível), o que tornou a suite naturalmente resiliente à profunda refatoração da Fase 2 (mudança de layout linear para grid, introdução de `react-native-reanimated`, `ReanimatedSwipeable`, transições animadas e validação com Zod). O estado global do Zustand é resetado antes de cada teste, garantindo isolamento total entre cenários.
-
   - **Cobertura de fluxos**:
     - Validação de entrada via Zod (rejeita textos vazios ou apenas espaços, exibe erro visual);
     - Edição de título via pressão no texto e submissão do teclado;
@@ -108,9 +107,19 @@ jest.setup.ts
 | **Zustand em vez de Context API**           | Para uma tela única, Context API introduziria boilerplate desnecessário (Providers, `useReducer`). Zustand oferece API mais concisa, melhor performance em atualizações frequentes (seletores evitam re-renders) e testabilidade superior (injeção direta de estado).                                                                          |
 | **Zod v3 em vez de v4**                     | O Zod v4 introduz sintaxe `export * as` que exige plugin adicional do Babel no React Native CLI. A v3 oferece a mesma API de schemas (`safeParse`, `z.infer`, `.pipe`, `.transform`) com compatibilidade imediata, sem alterar a configuração de build.                                                                                        |
 | **MMKV v4 em vez de AsyncStorage**          | MMKV oferece API síncrona (sem Promises), criptografia nativa e performance superior. A v4 adota o runtime Nitro, alinhado com a New Architecture do RN 0.85. O trade-off é a dependência adicional (`react-native-nitro-modules`) e o `pod install --repo-update`.                                                                            |
-| **Adapter MMKV com `createJSONStorage`**    | O Zustand exige `PersistStorage<T, unknown>`, que inclui `JSON.parse`/`JSON.stringify`. Em vez de implementar o adapter manualmente (que quebrava a tipagem), `createJSONStorage(() => adapter)` embrulha o MMKV corretamente, mantendo type-safety e permitindo `partialize`.                                                              |
+| **Adapter MMKV com `createJSONStorage`**    | O Zustand exige `PersistStorage<T, unknown>`, que inclui `JSON.parse`/`JSON.stringify`. Em vez de implementar o adapter manualmente (que quebrava a tipagem), `createJSONStorage(() => adapter)` embrulha o MMKV corretamente, mantendo type-safety e permitindo `partialize`.                                                                 |
 | **Mock de Reanimated no Jest**              | Reanimated v3/v4 depende de C++ nativo e Worklet Runtime, inexistentes no ambiente Node. O mock factory no `jest.setup.ts` com `__esModule: true` garante que `import Animated from 'react-native-reanimated'` resolva corretamente, permitindo que componentes com `Animated.FlatList` e `Animated.View` renderizem sem erros de `undefined`. |
 | **Edição via `onBlur` + `onSubmitEditing`** | Em vez de modais ou telas separadas, a edição inline reduz atrito cognitivo. O `TextInput` substitui o `Text` condicionalmente, mantendo o foco contextual e minimizando mudanças de layout.                                                                                                                                                   |
 | **Separação de Pendentes e Concluídas**     | A lista principal (`FlatList`) renderiza apenas pendentes para otimizar o VirtualizedList. Concluídas são renderizadas como `ListFooterComponent`, evitando complexidade de seções múltiplas enquanto mantém a hierarquia visual clara.                                                                                                        |
 | **Exclusão diferenciada por modo**          | Swipe é desabilitado no modo grid (`numColumns={2}`) porque o `ReanimatedSwipeable` não comporta bem layouts multi-coluna. O botão contextual com `Alert` de confirmação no grid evita exclusões acidentais em cards menores.                                                                                                                  |
 | **Padrão `index.tsx` por componente**       | Cada componente reside numa pasta própria com `index.tsx` e `styles.ts`. Isso padroniza imports (`components/TodoItem`), simplifica refatorações futuras (adicionar sub-componentes ou hooks locais) e mantém o barrel export (`components/index.tsx`) limpo.                                                                                  |
+
+## 🐛 Troubleshooting
+
+### Erro 65 no `yarn ios` (PhaseScriptExecution / Node não encontrado)
+
+Se o build falhar no `xcodebuild` relatando que o Node não foi encontrado (comum ao usar `fnm`/`nvm` que geram caminhos efêmeros), fixe o caminho absoluto do Node para os scripts do Xcode:
+
+```bash
+echo "export NODE_BINARY=\"$(node -p 'process.execPath')\"" > ios/.xcode.env.local
+```
