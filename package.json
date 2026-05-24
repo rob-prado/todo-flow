@@ -51,5 +51,8 @@
   },
   "engines": {
     "node": ">= 22.11.0"
+  },
+  "resolutions": {
+    "@react-native/gradle-plugin@npm:0.85.3": "patch:@react-native/gradle-plugin@npm%3A0.85.3#~/.yarn/patches/@react-native-gradle-plugin-npm-0.85.3-54b1bf7e6f.patch"
   }
 }

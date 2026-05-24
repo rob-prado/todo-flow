@@ -116,6 +116,22 @@ jest.setup.ts
 
 ## 🐛 Troubleshooting
 
+### Erro no Build Android (Gradle 9+): NoSuchFieldError IBM_SEMERU
+
+Se o build do Android falhar na inicialização com a mensagem `Class org.gradle.jvm.toolchain.JvmVendorSpec does not have member field '... IBM_SEMERU'`, isso ocorre devido a uma incompatibilidade entre o Gradle 9+ e versões antigas do plugin Foojay.
+
+Para corrigir (sem fazer downgrade do Gradle):
+
+1. Atualizada a versão do plugin no arquivo `android/settings.gradle` para `1.0.0`:
+   ```gradle
+   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+   ```
+2. O mesmo plugin roda de forma isolada dentro do React Native. Aplicado um patch no arquivo `node_modules/@react-native/gradle-plugin/settings.gradle.kts`, atualizando a versão também para `1.0.0`:
+   ```kotlin
+   id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0")
+   ```
+   _(Nota: a alteração do `node_modules` foi feita utilizando `yarn patch`)._
+
 ### Erro 65 no `yarn ios` (PhaseScriptExecution / Node não encontrado)
 
 Se o build falhar no `xcodebuild` relatando que o Node não foi encontrado (comum ao usar `fnm`/`nvm` que geram caminhos efêmeros), fixe o caminho absoluto do Node para os scripts do Xcode:
